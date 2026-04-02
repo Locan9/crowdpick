@@ -22,9 +22,38 @@ class _SimpleVoteState extends State<SimpleVote> {
       votes.clear();
       countCtrl.clear();
       nameCtrl.clear();
+      totalPeople = 0;
       peopleVoted = 0;
       setupDone = false;
     });
+  }
+
+  void showWinnerPopup() {
+    int maxVotes = votes[0];
+    int winnerIndex = 0;
+
+    for (int i = 1; i < votes.length; i++) {
+      if (votes[i] > maxVotes) {
+        maxVotes = votes[i];
+        winnerIndex = i;
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Winner"),
+        content: Text("${names[winnerIndex]} won with $maxVotes votes"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -41,15 +70,14 @@ class _SimpleVoteState extends State<SimpleVote> {
   Widget buildSetup() {
     return Column(
       children: [
-        // This is only asked once at the start
         TextField(
-          controller: countCtrl, 
+          controller: countCtrl,
           decoration: InputDecoration(labelText: "Step 1: Total Voters Count"),
           keyboardType: TextInputType.number,
         ),
         SizedBox(height: 20),
         TextField(
-          controller: nameCtrl, 
+          controller: nameCtrl,
           decoration: InputDecoration(labelText: "Step 2: Add Choice Name"),
         ),
         ElevatedButton(
@@ -66,9 +94,10 @@ class _SimpleVoteState extends State<SimpleVote> {
         ),
         Text("Total choices so far: ${names.length}"),
         Spacer(),
-        // This button locks everything in and switches to the voting screen
         ElevatedButton(
-          style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50)),
+          style: ElevatedButton.styleFrom(
+            minimumSize: Size(double.infinity, 50),
+          ),
           child: Text("LOCK SETTINGS & START"),
           onPressed: () {
             int voters = int.tryParse(countCtrl.text) ?? 0;
@@ -86,9 +115,13 @@ class _SimpleVoteState extends State<SimpleVote> {
 
   Widget buildVoting() {
     bool isFinished = peopleVoted >= totalPeople;
+
     return Column(
       children: [
-        Text("Progress: $peopleVoted / $totalPeople", style: TextStyle(fontSize: 20)),
+        Text(
+          "Progress: $peopleVoted / $totalPeople",
+          style: TextStyle(fontSize: 20),
+        ),
         Expanded(
           child: ListView.builder(
             itemCount: names.length,
@@ -97,17 +130,35 @@ class _SimpleVoteState extends State<SimpleVote> {
               child: ListTile(
                 title: Text(names[i]),
                 trailing: Text("Votes: ${votes[i]}"),
-                onTap: !isFinished ? () => setState(() {
-                  votes[i]++;
-                  peopleVoted++;
-                }) : null,
+                onTap: !isFinished
+                    ? () {
+                        setState(() {
+                          votes[i]++;
+                          peopleVoted++;
+                        });
+
+                        if (peopleVoted == totalPeople) {
+                          showWinnerPopup();
+                        }
+                      }
+                    : null,
               ),
             ),
           ),
         ),
         if (isFinished) ...[
-          Text("VOTING FINISHED!", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24)),
-          ElevatedButton(onPressed: resetApp, child: Text("RESTART NEW POLL")),
+          Text(
+            "VOTING FINISHED!",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: resetApp,
+            child: Text("RESTART NEW POLL"),
+          ),
         ],
       ],
     );
