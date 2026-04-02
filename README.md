@@ -20,7 +20,7 @@ The app operates as a two-stage **State Machine**:
 
 1. **Setup Phase**: The coordinator defines the total number of voters and adds choice names. Data is stored in two synchronized lists (`names` and `votes`).
 2. **Voting Phase**: The UI "locks" the configuration. Users tap choices to increment counts until the voter limit is reached.
-3. **Result Phase**: Once the limit is hit, voting is disabled, and a "Restart" option appears to clear the state.
+3. **Result Phase**: Once the limit is hit, voting is disabled, a popup displays the winner and total votes, and a "Restart" option appears to reset the state.
 
 ---
 
@@ -32,6 +32,7 @@ The application is built around a simple state-driven workflow:
 * Once voting begins, the state changes and input is locked.
 * Each vote updates the corresponding index in the `votes` list using the same position as `names`.
 * When `peopleVoted` reaches `totalPeople`, the app transitions to the **result state** and disables further interaction.
+* When voting completes, a function determines the highest vote count and displays the winner using a popup dialog.
 
 This ensures consistent data flow and prevents invalid operations during runtime.
 
@@ -42,6 +43,7 @@ This ensures consistent data flow and prevents invalid operations during runtime
 * **Input Validation**: Prevents adding empty strings or invalid voter counts.
 * **One-Time Setup**: Ensures the total voter count remains constant once the poll begins.
 * **Real-Time Progress**: Tracks `peopleVoted` vs `totalPeople` using Flutter's `setState`.
+* **Winner Popup**: Displays the winning choice and total votes automatically when voting finishes.
 
 ---
 
@@ -55,7 +57,7 @@ This ensures consistent data flow and prevents invalid operations during runtime
 
 ## 📁 File Structure
 
-```id="6t2d5x"
+```id="q9c6fq"
 crowdpick/
 ├── lib/
 │   └── main.dart        # Main app logic (UI + voting state machine)
