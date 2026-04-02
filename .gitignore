@@ -43,3 +43,21 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# iOS (safe to ignore generated stuff)
+
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Android Gradle cache
+
+android/.gradle/
+
+# Web / Desktop (you don't need these)
+
+web/
+linux/
+macos/
+windows/
